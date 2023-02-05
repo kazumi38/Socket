@@ -1,15 +1,4 @@
-#include <stdio.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
-#define MAXPENDING 5
-#define RCVBUFFERSEIZE 32
-
-void DieWithError(char* errorMessage);
-void HandleTCPClient(int clntSocket);
+#include "TCPEchoServer.h"
 
 int main(int argc, char *argv[]){
     int servSock;
@@ -55,27 +44,27 @@ int main(int argc, char *argv[]){
     }
 }
 
-void DieWithError(char* errorMessage){
-    perror(errorMessage);
-    exit(1);
-}
+// void DieWithError(char* errorMessage){
+//     perror(errorMessage);
+//     exit(1);
+// }
 
-void HandleTCPClient(int clntSocket){
-    char echoBuffer[RCVBUFFERSEIZE];
-    int recvMsgSize;
+// void HandleTCPClient(int clntSocket){
+//     char echoBuffer[RCVBUFSIZE];
+//     int recvMsgSize;
 
-    if((recvMsgSize = recv(clntSocket, echoBuffer, RCVBUFFERSEIZE, 0)) < 0){
-        DieWithError("recv() failed");
-    }
+//     if((recvMsgSize = recv(clntSocket, echoBuffer, RCVBUFSIZE, 0)) < 0){
+//         DieWithError("recv() failed");
+//     }
 
-    while (recvMsgSize > 0){
-        if (send(clntSocket, echoBuffer, recvMsgSize, 0) != recvMsgSize){
-            DieWithError("send() failed");
-        }
+//     while (recvMsgSize > 0){
+//         if (send(clntSocket, echoBuffer, recvMsgSize, 0) != recvMsgSize){
+//             DieWithError("send() failed");
+//         }
 
-        if((recvMsgSize = recv(clntSocket, echoBuffer, RCVBUFFERSEIZE, 0))){
-            DieWithError("recv() failed");
-        }
-    }
-    close(clntSocket);
-}
+//         if((recvMsgSize = recv(clntSocket, echoBuffer, RCVBUFSIZE, 0))){
+//             DieWithError("recv() failed");
+//         }
+//     }
+//     close(clntSocket);
+// }

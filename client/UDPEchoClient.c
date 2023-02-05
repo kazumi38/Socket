@@ -12,7 +12,7 @@ void DieWithError(char *errorMessage);
 int main(int argc, char *argv[]){
     int sock;
     struct sockaddr_in echoServAddr;
-    struct sockaddr_in formAddr;
+    struct sockaddr_in fromAddr;
 
     unsigned short echoServPort;
     unsigned int fromSize;
@@ -47,28 +47,36 @@ int main(int argc, char *argv[]){
     if((sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0){
         DieWithError("socket() failed");
     }
+    
 
     memset(&echoServAddr, 0, sizeof(echoServAddr));
     echoServAddr.sin_family = AF_INET;
     echoServAddr.sin_addr.s_addr = inet_addr(servIP);
     echoServAddr.sin_port = htons(echoServPort);
 
-    if(sendto(sock, echoString, echoStringLen, 0, (struct sockaddr *)&echoServAddr,     sizeof(echoServAddr)) != echoStringLen){
+    printf("echo server address : %s %d\n", inet_ntoa(echoServAddr.sin_addr), echoServAddr.sin_addr.s_addr);
+
+
+    if(sendto(sock, echoString, echoStringLen, 0, (struct sockaddr *)&echoServAddr, sizeof(echoServAddr)) != echoStringLen){
         DieWithError("sendto() snet a different number tof bytes than expected");
     }
 
-    fromSize = sizeof(fromSize);
-    if((respStringLen = recvfrom(sock, echoBuffer, ECHOMAX, 0, (struct sockaddr *)&formAddr, &fromSize)) != echoStringLen){
+    fromSize = sizeof(fromAddr);
+    if((respStringLen = recvfrom(sock, echoBuffer, ECHOMAX, 0, (struct sockaddr *)&fromAddr, &fromSize)) != echoStringLen){
         DieWithError("recvfrom() failed");
-    }
-
-    if(echoServAddr.sin_addr.s_addr != formAddr.sin_addr.s_addr){
-        fprintf(stderr, "Error: received a packet from unknown source.\n");
-        exit(1);
     }
 
     echoBuffer[respStringLen] = '\0';
     printf("Received: %s\n", echoBuffer);
+    printf("echo server address : %s %d\n", inet_ntoa(echoServAddr.sin_addr), echoServAddr.sin_addr.s_addr);
+    printf("from server address : %s %d\n", inet_ntoa(fromAddr.sin_addr), fromAddr.sin_addr.s_addr);
+
+
+    if(echoServAddr.sin_addr.s_addr != fromAddr.sin_addr.s_addr){
+        fprintf(stderr, "Error: received a packet from unknown source.\n");
+        exit(1);
+    }
+
 
     close(sock);
     exit(0);

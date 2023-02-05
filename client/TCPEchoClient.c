@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <netdb.h>
 
 #define RCVBUFSIZE 32
 
@@ -18,6 +19,8 @@ int main(int argc, char *argv[]){
     char echoBuffer[RCVBUFSIZE];
     unsigned int echoStringLen;
     int bytesRcvd, totalBytesRcvd;
+
+    struct hostent *hostent1;
 
     if((argc < 3) || (argc > 4)){
         fprintf(stderr, "Usage: %s <Server IP> <Echo Word> [Echo Port]\n", argv[0]);
@@ -39,7 +42,9 @@ int main(int argc, char *argv[]){
 
     memset(&echoServAddr, 0, sizeof(echoServAddr));
     echoServAddr.sin_family = AF_INET;
-    echoServAddr.sin_addr.s_addr = inet_addr(servIP);
+    // echoServAddr.sin_addr.s_addr = inet_addr(servIP);
+    hostent1 = gethostbyname(servIP);
+    echoServAddr.sin_addr.s_addr = *(unsigned long *)hostent1->h_addr_list[0];
     echoServAddr.sin_port = htons(echoServPort);
 
     if(connect(sock, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr)) < 0){
